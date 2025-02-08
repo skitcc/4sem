@@ -6,6 +6,9 @@
 #include <QPainter>
 #include <QInputDialog>
 #include <QDebug>
+#include <iostream>
+#include <cmath>
+
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -104,8 +107,6 @@ void MainWindow::editPointFromCanvas(double x, double y) {
         for (int i = 0; i < table->rowCount(); i++) {
             double tableX = table->item(i, 0)->text().toDouble();
             double tableY = table->item(i, 1)->text().toDouble();
-            qDebug() << tableX;
-            qDebug() << tableY;
             if (std::abs(tableX - x) < 1e-6 && std::abs(tableY - y) < 1e-6) {
                 table->item(i, 0)->setText(QString::number(newX));
                 table->item(i, 1)->setText(QString::number(newY));
@@ -195,9 +196,75 @@ void MainWindow::deletePointFromTable(int row) {
     cartesian_axis->deletePointAt(x, y);
 }
 
-void MainWindow::onButtonSolve() {
-    return;
+
+double MainWindow::length(double x1, double y1, double x2, double y2) {
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
+
+
+double MainWindow::calculate_min_median(struct Point A, struct Point B, struct Point C) {
+    double ma, mb, mc;
+    double ab, bc, ac; 
+
+    ab = length(A.x, A.y, B.x, B.y);
+    bc = length(B.x, B.y, C.x, C.y);
+    ac = length(A.x, A.y, C.x, C.y);
+
+
+    ma = 0.5 * sqrt(2 * pow(ab, 2) + 2 * pow(ac, 2) - pow(bc, 2));
+    mb = 0.5 * sqrt(2 * pow(ab, 2) + 2 * pow(bc, 2) - pow(ac, 2));
+    mc = 0.5 * sqrt(2 * pow(bc, 2) + 2 * pow(ac, 2) - pow(ab, 2));
+
+    return std::min({ma, mb, mc});
+
+
+}
+
+void MainWindow::onButtonSolve() {
+
+    QVector<Point> real_points;
+
+    for (int i = 0; i < table->rowCount(); ++i) {
+        double tableX = table->item(i, 0)->text().toDouble();
+        double tableY = table->item(i, 1)->text().toDouble();
+        real_points.append({tableX, tableY});
+    }
+
+    double minMedian = 1e308;
+
+    if (real_points.size() < 3) {
+        QMessageBox::warning(this, "Ошибка", "Недостаточно точек для построения треугольника!");
+        return;
+    }
+
+    Point minA, minB, minC;
+    for (int i = 0; i < real_points.size(); i++) {
+        for (int j = i + 1; j < real_points.size(); j++) {
+            for (int k = j + 1; k < real_points.size(); k++) {
+                double median = calculate_min_median(real_points[i], real_points[j], real_points[k]);
+                if (median < minMedian) {
+                    minMedian = median;
+                    minA = real_points[i];
+                    minB = real_points[j];
+                    minC = real_points[k];
+                }
+            }
+        }
+    }
+
+
+
+    // Выводим результат
+    QMessageBox::information(this, "Результат", QString("Треугольник с минимальной медианой: \n"
+                                                        "A(%1, %2)\nB(%3, %4)\nC(%5, %6)\n"
+                                                        "Минимальная медиана: %7")
+                             .arg(minA.x).arg(minA.y)
+                             .arg(minB.x).arg(minB.y)
+                             .arg(minC.x).arg(minC.y)
+                             .arg(minMedian));
+}
+
+
 
 
 MainWindow::~MainWindow()

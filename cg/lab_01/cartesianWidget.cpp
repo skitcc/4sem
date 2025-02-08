@@ -88,6 +88,17 @@ void CartesianAxis::deletePointAt(double x, double y) {
 }
 
 
+
+void CartesianAxis::setTriangle(const QPointF& a, const QPointF& b, const QPointF& c) {
+    triangle_points.append(a);
+    triangle_points.append(b);
+    triangle_points.append(c);
+}
+
+
+void 
+
+
 void CartesianAxis::mousePressEvent(QMouseEvent *event) {
 
 
@@ -116,8 +127,6 @@ void CartesianAxis::mousePressEvent(QMouseEvent *event) {
                     emit pointToEdit(point.x(), point.y());
                 } else if (selectedAction == removeAction) {
                     emit pointToDelete(point.x(), point.y());
-                    // deletePointAt(point.x(), point.y());
-
                 }
                 return;
             }

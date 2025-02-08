@@ -14,9 +14,12 @@ public:
     void addPoint(double x, double y);
     void deletePoints(void);
     void deletePointAt(double x, double y);
+    void setTriangle(const QPointF& a, const QPointF& b, const QPointF& c);
+    void paintTriangle()
 
 private:
     QVector<QPointF> points;
+    QVector<QPointF> triangle_points;
 
 signals:
     void pointClicked(double x, double y);
