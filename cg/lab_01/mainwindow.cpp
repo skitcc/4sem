@@ -17,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->resize(1200, 700);
+
     cartesian_axis = new CartesianAxis(ui->cartesianWidget);
     cartesian_axis->setGeometry(ui->cartesianWidget->geometry());
 
@@ -43,9 +45,6 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::onButtonPush() {
-
-    QPainter painter(this);
-
     QString xText = ui->lineEdit_1->text();
     QString yText = ui->lineEdit_2->text();
 
@@ -202,7 +201,7 @@ double MainWindow::length(double x1, double y1, double x2, double y2) {
 }
 
 
-double MainWindow::calculate_min_median(struct Point A, struct Point B, struct Point C) {
+double MainWindow::calculate_min_median(struct Point A, struct Point B, struct Point C, struct Point &startMedian, struct Point &endMedian) {
     double ma, mb, mc;
     double ab, bc, ac; 
 
@@ -215,8 +214,23 @@ double MainWindow::calculate_min_median(struct Point A, struct Point B, struct P
     mb = 0.5 * sqrt(2 * pow(ab, 2) + 2 * pow(bc, 2) - pow(ac, 2));
     mc = 0.5 * sqrt(2 * pow(bc, 2) + 2 * pow(ac, 2) - pow(ab, 2));
 
-    return std::min({ma, mb, mc});
+    double minMedian = std::min({ma, mb, mc});
 
+
+    if (minMedian == ma) {
+        startMedian = A;
+        endMedian = {(B.x + C.x) / 2, (B.y + C.y) / 2};
+    }
+    else if (minMedian == mb) {
+        startMedian = B;
+        endMedian = {(A.x + C.x) / 2, (A.y + C.y) / 2};
+    }
+    else {
+        startMedian = C;
+        endMedian = {(A.x + B.x) / 2, (A.y + B.y) / 2};
+    }
+
+    return minMedian;
 
 }
 
@@ -238,28 +252,51 @@ void MainWindow::onButtonSolve() {
     }
 
     Point minA, minB, minC;
+    Point startMedian, endMedian;
+    Point minMedianStart, minMedianEnd;
+    int vertexA, vertexB, vertexC;
+
     for (int i = 0; i < real_points.size(); i++) {
         for (int j = i + 1; j < real_points.size(); j++) {
             for (int k = j + 1; k < real_points.size(); k++) {
-                double median = calculate_min_median(real_points[i], real_points[j], real_points[k]);
+                double median = calculate_min_median(real_points[i], real_points[j], real_points[k], startMedian, endMedian);
                 if (median < minMedian) {
                     minMedian = median;
                     minA = real_points[i];
                     minB = real_points[j];
                     minC = real_points[k];
+                    minMedianStart = startMedian;
+                    minMedianEnd = endMedian;
+                    vertexA = i + 1;
+                    vertexB = j + 1;
+                    vertexC = k + 1;
                 }
             }
         }
     }
 
 
+    for (int i = real_points.size() - 1; i >= 0; i--) {
+        if (i != vertexA - 1 && i != vertexB - 1 && i != vertexC - 1) {
+            real_points.removeAt(i);
+            deletePointFromTable(i);
+        }
+    }
 
-    // Выводим результат
+
+
+    cartesian_axis->setTriangle(QPointF(minA.x, minA.y), QPointF(minB.x, minB.y), QPointF(minC.x, minC.y));
+    cartesian_axis->setMedian(QPointF(minMedianStart.x, minMedianStart.y), QPointF(minMedianEnd.x, minMedianEnd.y));
+    cartesian_axis->deleteNotTriangle();
+
     QMessageBox::information(this, "Результат", QString("Треугольник с минимальной медианой: \n"
-                                                        "A(%1, %2)\nB(%3, %4)\nC(%5, %6)\n"
-                                                        "Минимальная медиана: %7")
+                                                        "%1(%2, %3)\n%4(%5, %6)\n%7(%8, %9)\n"
+                                                        "Минимальная медиана: %10")
+                             .arg(vertexA)
                              .arg(minA.x).arg(minA.y)
+                             .arg(vertexB)
                              .arg(minB.x).arg(minB.y)
+                             .arg(vertexC)
                              .arg(minC.x).arg(minC.y)
                              .arg(minMedian));
 }

@@ -49,7 +49,7 @@ private:
     void editPointFromTable(int row);
     void deletePointFromTable(int row);
     double length(double x1, double y1, double x2, double y2);
-    double calculate_min_median(struct Point A, struct Point B, struct Point C);
+    double calculate_min_median(struct Point A, struct Point B, struct Point C, struct Point &startMedian, struct Point &endMedian);
 
 };
 #endif // MAINWINDOW_H

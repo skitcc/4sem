@@ -15,11 +15,17 @@ public:
     void deletePoints(void);
     void deletePointAt(double x, double y);
     void setTriangle(const QPointF& a, const QPointF& b, const QPointF& c);
-    void paintTriangle()
+    void setMedian(const QPointF& a, const QPointF& b);
+    void deleteNotTriangle(void);
+    void autoScale(void);
 
 private:
     QVector<QPointF> points;
     QVector<QPointF> triangle_points;
+    QVector<QPointF> median_points;
+    double scale;
+    double offsetX;
+    double offsetY;
 
 signals:
     void pointClicked(double x, double y);
