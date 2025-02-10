@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(cartesian_axis, &CartesianAxis::pointToEdit, this, &MainWindow::editPointFromCanvas);
     connect(cartesian_axis, &CartesianAxis::pointToDelete, this, &MainWindow::deletePointFromCanvas);
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &MainWindow::showTableContextMenu);
+    connect(ui->pushButtonResetScale, &QPushButton::clicked, this, &MainWindow::resetScale);
 }
 
 void MainWindow::onButtonPush() {
@@ -59,7 +60,7 @@ void MainWindow::onButtonPush() {
         return;
     };
 
-    points.append({x, y});
+    points.append(QPointF(x, y));
 
     int row = table->rowCount();
     table->insertRow(row);
@@ -69,6 +70,10 @@ void MainWindow::onButtonPush() {
     cartesian_axis->addPoint(x, y);  
 
     QMessageBox::information(this, "Успех", QString("Точка (%1, %2) добавлена!").arg(x).arg(y));
+}
+
+void MainWindow::resetScale() {
+    cartesian_axis->resetScale();
 }
 
 
@@ -116,7 +121,7 @@ void MainWindow::editPointFromCanvas(double x, double y) {
 
 
     for (int i = 0; i < points.size(); i++) {
-        if (std::abs(x - points[i].x) <= EPS && std::abs(y - points[i].y) <= EPS) {
+        if (std::abs(x - points[i].x()) <= EPS && std::abs(y - points[i].y()) <= EPS) {
             points.removeAt(i);
             update();
             break;
@@ -140,7 +145,7 @@ void MainWindow::deletePointFromCanvas(double x, double y) {
     if (row != -1) {
         table->removeRow(row);
         for (int i = 0; i < points.size(); ++i) {
-            if (std::abs(points[i].x - x) <= EPS && std::abs(points[i].y - y) <= EPS) {
+            if (std::abs(points[i].x() - x) <= EPS && std::abs(points[i].y() - y) <= EPS) {
                 points.removeAt(i);
                 break;
             }
@@ -196,18 +201,18 @@ void MainWindow::deletePointFromTable(int row) {
 }
 
 
-double MainWindow::length(double x1, double y1, double x2, double y2) {
+double length(double x1, double y1, double x2, double y2) {
     return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
 
-double MainWindow::calculate_min_median(struct Point A, struct Point B, struct Point C, struct Point &startMedian, struct Point &endMedian) {
+double calculate_min_median(struct Triangle& triangle, struct Median& median) {
     double ma, mb, mc;
     double ab, bc, ac; 
 
-    ab = length(A.x, A.y, B.x, B.y);
-    bc = length(B.x, B.y, C.x, C.y);
-    ac = length(A.x, A.y, C.x, C.y);
+    ab = length(triangle.A.x(), triangle.A.y(), triangle.B.x(), triangle.B.y());
+    bc = length(triangle.B.x(), triangle.B.y(), triangle.C.x(), triangle.C.y());
+    ac = length(triangle.A.x(), triangle.A.y(), triangle.C.x(), triangle.C.y());
 
 
     ma = 0.5 * sqrt(2 * pow(ab, 2) + 2 * pow(ac, 2) - pow(bc, 2));
@@ -218,16 +223,16 @@ double MainWindow::calculate_min_median(struct Point A, struct Point B, struct P
 
 
     if (minMedian == ma) {
-        startMedian = A;
-        endMedian = {(B.x + C.x) / 2, (B.y + C.y) / 2};
+        median.startMedian = triangle.A;
+        median.endMedian = {(triangle.B.x() + triangle.C.x()) / 2, (triangle.B.y() + triangle.C.y()) / 2};
     }
     else if (minMedian == mb) {
-        startMedian = B;
-        endMedian = {(A.x + C.x) / 2, (A.y + C.y) / 2};
+        median.startMedian = triangle.B;
+        median.endMedian = {(triangle.A.x() + triangle.C.x()) / 2, (triangle.A.y() + triangle.C.y()) / 2};
     }
     else {
-        startMedian = C;
-        endMedian = {(A.x + B.x) / 2, (A.y + B.y) / 2};
+        median.startMedian = triangle.C;
+        median.endMedian = {(triangle.A.x() + triangle.B.x()) / 2, (triangle.A.y() + triangle.B.y()) / 2};
     }
 
     return minMedian;
@@ -236,12 +241,12 @@ double MainWindow::calculate_min_median(struct Point A, struct Point B, struct P
 
 void MainWindow::onButtonSolve() {
 
-    QVector<Point> real_points;
+    QVector<QPointF> real_points;
 
     for (int i = 0; i < table->rowCount(); ++i) {
         double tableX = table->item(i, 0)->text().toDouble();
         double tableY = table->item(i, 1)->text().toDouble();
-        real_points.append({tableX, tableY});
+        real_points.append(QPointF{tableX, tableY});
     }
 
     double minMedian = 1e308;
@@ -251,22 +256,25 @@ void MainWindow::onButtonSolve() {
         return;
     }
 
-    Point minA, minB, minC;
-    Point startMedian, endMedian;
-    Point minMedianStart, minMedianEnd;
+    QPointF minA, minB, minC;
+    QPointF startMedian, endMedian;
+    QPointF minMedianStart, minMedianEnd;
     int vertexA, vertexB, vertexC;
+
 
     for (int i = 0; i < real_points.size(); i++) {
         for (int j = i + 1; j < real_points.size(); j++) {
             for (int k = j + 1; k < real_points.size(); k++) {
-                double median = calculate_min_median(real_points[i], real_points[j], real_points[k], startMedian, endMedian);
+                struct Triangle triangle = {real_points[i], real_points[j], real_points[k]};
+                struct Median medianVertexes = {startMedian, endMedian};
+                double median = calculate_min_median(triangle, medianVertexes);
                 if (median < minMedian) {
                     minMedian = median;
-                    minA = real_points[i];
-                    minB = real_points[j];
-                    minC = real_points[k];
-                    minMedianStart = startMedian;
-                    minMedianEnd = endMedian;
+                    minA = triangle.A;
+                    minB = triangle.B;
+                    minC = triangle.C;
+                    minMedianStart = medianVertexes.startMedian;
+                    minMedianEnd = medianVertexes.endMedian;
                     vertexA = i + 1;
                     vertexB = j + 1;
                     vertexC = k + 1;
@@ -285,19 +293,20 @@ void MainWindow::onButtonSolve() {
 
 
 
-    cartesian_axis->setTriangle(QPointF(minA.x, minA.y), QPointF(minB.x, minB.y), QPointF(minC.x, minC.y));
-    cartesian_axis->setMedian(QPointF(minMedianStart.x, minMedianStart.y), QPointF(minMedianEnd.x, minMedianEnd.y));
+    cartesian_axis->setTriangle(minA, minB, minC);
+    cartesian_axis->setMedian(QPointF(minMedianStart.x(), minMedianStart.y()), QPointF(minMedianEnd.x(), minMedianEnd.y()));
     cartesian_axis->deleteNotTriangle();
+    cartesian_axis->resetScale();
 
     QMessageBox::information(this, "Результат", QString("Треугольник с минимальной медианой: \n"
                                                         "%1(%2, %3)\n%4(%5, %6)\n%7(%8, %9)\n"
                                                         "Минимальная медиана: %10")
                              .arg(vertexA)
-                             .arg(minA.x).arg(minA.y)
+                             .arg(minA.x()).arg(minA.y())
                              .arg(vertexB)
-                             .arg(minB.x).arg(minB.y)
+                             .arg(minB.x()).arg(minB.y())
                              .arg(vertexC)
-                             .arg(minC.x).arg(minC.y)
+                             .arg(minC.x()).arg(minC.y())
                              .arg(minMedian));
 }
 

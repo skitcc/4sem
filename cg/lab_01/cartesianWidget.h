@@ -18,14 +18,26 @@ public:
     void setMedian(const QPointF& a, const QPointF& b);
     void deleteNotTriangle(void);
     void autoScale(void);
+    QPointF convertPixToMath(QPointF point);
+    QPointF convertMathToPix(const QPointF& mathPoint);
+    void updateOffsets();
+    void formTriangle(QPainter& painter);
+    void formMedian(QPainter& painter);
+    void formAxis(QPainter& painter);
+    void formDots(QPainter& painter);
+    void resetScale();
 
 private:
     QVector<QPointF> points;
     QVector<QPointF> triangle_points;
     QVector<QPointF> median_points;
     double scale;
-    double offsetX;
-    double offsetY;
+    double defaultScale = 20.0;    
+    bool isAutoScaled = false;
+    double offsetX = 0;
+    double offsetY = 0;
+    double centerX;
+    double centerY;
 
 signals:
     void pointClicked(double x, double y);
@@ -36,6 +48,7 @@ signals:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 };
 
 

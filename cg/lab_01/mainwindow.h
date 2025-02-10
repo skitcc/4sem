@@ -8,12 +8,17 @@
 
 #include "cartesianWidget.h"
 
-
-struct Point {
-    double x;
-    double y;
+struct Triangle {
+    QPointF A;
+    QPointF B;
+    QPointF C;
 };
 
+
+struct Median {
+    QPointF startMedian;
+    QPointF endMedian;
+};
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,7 +37,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QVector<Point> points;
+    QVector<QPointF> points;
     CartesianAxis *cartesian_axis;
     QStandardItemModel *table;
 
@@ -44,12 +49,10 @@ private slots:
     void editPointFromCanvas(double x, double y);
     void deletePointFromCanvas(double x, double y);
     void showTableContextMenu(const QPoint &pos);
+    void resetScale();
 
 private:
     void editPointFromTable(int row);
     void deletePointFromTable(int row);
-    double length(double x1, double y1, double x2, double y2);
-    double calculate_min_median(struct Point A, struct Point B, struct Point C, struct Point &startMedian, struct Point &endMedian);
-
 };
 #endif // MAINWINDOW_H

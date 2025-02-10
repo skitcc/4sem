@@ -64,9 +64,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonDeleteLast">
+        <widget class="QPushButton" name="pushButtonResetScale">
          <property name="text">
-          <string>Удалить последнюю добавленную точку</string>
+          <string>Вернуть обычный масштаб</string>
          </property>
         </widget>
        </item>
