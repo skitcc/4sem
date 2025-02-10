@@ -127,21 +127,39 @@ void CartesianAxis::formTriangle(QPainter& painter) {
     QPointF B = convertMathToPix(triangle_points[1]);
     QPointF C = convertMathToPix(triangle_points[2]);
 
+    painter.setPen(Qt::red);
     painter.drawLine(A, B);
     painter.drawLine(B, C);
     painter.drawLine(A, C);
 
     painter.setPen(Qt::green);
 
+    int widgetWidth = width();
+    int widgetHeight = height();
+    int textOffsetX, textOffsetY;
+
+    auto adjustTextPosition = [&](QPointF point) -> QPointF {
+        textOffsetX = 5;
+        textOffsetY = -5;
+
+        if (point.x() > widgetWidth - 50) textOffsetX = -50;
+        if (point.y() < 30) textOffsetY = 15;
+        if (point.x() < 30) textOffsetX = 10;
+        if (point.y() > widgetHeight - 30) textOffsetY = -15;
+
+        return QPointF(point.x() + textOffsetX, point.y() + textOffsetY);
+    };
+
     painter.drawEllipse(A, 3, 3);
-    painter.drawText(A.x() + 5, A.y() + 5, QString::number(1));
+    painter.drawText(adjustTextPosition(A), QString("1 (%1, %2)").arg(triangle_points[0].x(), 0, 'f', 2).arg(triangle_points[0].y(), 0, 'f', 2));
 
     painter.drawEllipse(B, 3, 3);
-    painter.drawText(B.x() + 5, B.y() + 5, QString::number(2));
+    painter.drawText(adjustTextPosition(B), QString("2 (%1, %2)").arg(triangle_points[1].x(), 0, 'f', 2).arg(triangle_points[1].y(), 0, 'f', 2));
 
     painter.drawEllipse(C, 3, 3);
-    painter.drawText(C.x() + 5, C.y() + 5, QString::number(3));
+    painter.drawText(adjustTextPosition(C), QString("3 (%1, %2)").arg(triangle_points[2].x(), 0, 'f', 2).arg(triangle_points[2].y(), 0, 'f', 2));
 }
+
 
 
 void CartesianAxis::formMedian(QPainter& painter) {
@@ -170,20 +188,20 @@ void CartesianAxis::formAxis(QPainter& painter) {
 
     for (int i = centerX + step, value = 1; i < width(); i += step, ++value) {
         painter.drawLine(i, centerY - tickLength, i, centerY + tickLength);
-        painter.drawText(i - 10, centerY + 20, QString::number(value / scaleFactor, 'f', 0));
+        painter.drawText(i - 10, centerY + 20, QString::number(value));
     }
     for (int i = centerX - step, value = -1; i > 0; i -= step, --value) {
         painter.drawLine(i, centerY - tickLength, i, centerY + tickLength);
-        painter.drawText(i - 10, centerY + 20, QString::number(value / scaleFactor, 'f', 0));
+        painter.drawText(i - 10, centerY + 20, QString::number(value));
     }
     for (int i = centerY - step, value = 1; i > 0; i -= step, ++value) {
 
         painter.drawLine(centerX - tickLength, i, centerX + tickLength, i);
-        painter.drawText(centerX + 10, i + 5, QString::number(value / scaleFactor, 'f', 0));
+        painter.drawText(centerX + 10, i + 5, QString::number(value));
     }
     for (int i = centerY + step, value = -1; i < height(); i += step, --value) {
         painter.drawLine(centerX - tickLength, i, centerX + tickLength, i);
-        painter.drawText(centerX + 10, i + 5, QString::number(value / scaleFactor, 'f', 0));
+        painter.drawText(centerX + 10, i + 5, QString::number(value));
     }
 }
 
