@@ -7,6 +7,12 @@
 
 #define EPS 1e-6
 
+
+#include "structs.h"
+
+
+
+
 class CartesianAxis : public QWidget {
     Q_OBJECT
 public:
@@ -14,8 +20,8 @@ public:
     void addPoint(double x, double y);
     void deletePoints(void);
     void deletePointAt(double x, double y);
-    void setTriangle(const QPointF& a, const QPointF& b, const QPointF& c);
-    void setMedian(const QPointF& a, const QPointF& b);
+    void setTriangle(Triangle import_triangle);
+    void setMedian(Median import_median);
     void deleteNotTriangle(void);
     void autoScale(void);
     QPointF convertPixToMath(QPointF point);
@@ -26,11 +32,10 @@ public:
     void formAxis(QPainter& painter);
     void formDots(QPainter& painter);
     void resetScale();
-
 private:
     QVector<QPointF> points;
-    QVector<QPointF> triangle_points;
-    QVector<QPointF> median_points;
+    Triangle triangle;
+    Median median;
     double scale;
     double defaultScale = 20.0;    
     bool isAutoScaled = false;

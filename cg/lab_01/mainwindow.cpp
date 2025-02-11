@@ -239,6 +239,45 @@ double calculate_min_median(struct Triangle& triangle, struct Median& median) {
 
 }
 
+
+bool isDegenerateTriangle(const Triangle& triangle) {
+    return (std::abs(triangle.A.x() - triangle.B.x()) <= EPS && std::abs(triangle.B.x() - triangle.C.x()) <= EPS) ||
+           (std::abs(triangle.A.y() - triangle.B.y()) <= EPS && std::abs(triangle.B.y() - triangle.C.y()) <= EPS);
+}
+
+
+
+TriangleWithMedian findTriangleWithMinMedian(const QVector<QPointF>& points, int& countTriangles, int& countDegenerates) {
+
+    TriangleWithMedian bestTriangle;
+    for (int i = 0; i < points.size(); i++) {
+        for (int j = i + 1; j < points.size(); j++) {
+            for (int k = j + 1; k < points.size(); k++) {
+                Triangle triangle = {points[i], points[j], points[k]};
+                Median medianVertexes;
+                countTriangles++;
+                if (isDegenerateTriangle(triangle)) {
+                    countDegenerates++;
+                    continue;
+                }
+
+                double median = calculate_min_median(triangle, medianVertexes);
+                if (median < bestTriangle.minMedian) {
+                    bestTriangle.minMedian = median;
+                    bestTriangle.triangle = {triangle.A, triangle.B, triangle.C};
+                    bestTriangle.median = {medianVertexes.startMedian, medianVertexes.endMedian};
+                    bestTriangle.vertexes = {i + 1, j + 1, k + 1};
+                }
+            }
+        }
+    }
+
+    return bestTriangle;
+}
+
+
+
+
 void MainWindow::onButtonSolve() {
 
     QVector<QPointF> real_points;
@@ -249,65 +288,50 @@ void MainWindow::onButtonSolve() {
         real_points.append(QPointF{tableX, tableY});
     }
 
-    double minMedian = 1e308;
+    double minMedian = std::numeric_limits<double>::max();
 
     if (real_points.size() < 3) {
         QMessageBox::warning(this, "Ошибка", "Недостаточно точек для построения треугольника!");
         return;
     }
 
-    QPointF minA, minB, minC;
-    QPointF startMedian, endMedian;
-    QPointF minMedianStart, minMedianEnd;
-    int vertexA, vertexB, vertexC;
+    int countDegenerates = 0;
+    int countTriangles = 0;
 
 
-    for (int i = 0; i < real_points.size(); i++) {
-        for (int j = i + 1; j < real_points.size(); j++) {
-            for (int k = j + 1; k < real_points.size(); k++) {
-                struct Triangle triangle = {real_points[i], real_points[j], real_points[k]};
-                struct Median medianVertexes = {startMedian, endMedian};
-                double median = calculate_min_median(triangle, medianVertexes);
-                if (median < minMedian) {
-                    minMedian = median;
-                    minA = triangle.A;
-                    minB = triangle.B;
-                    minC = triangle.C;
-                    minMedianStart = medianVertexes.startMedian;
-                    minMedianEnd = medianVertexes.endMedian;
-                    vertexA = i + 1;
-                    vertexB = j + 1;
-                    vertexC = k + 1;
-                }
-            }
-        }
+    TriangleWithMedian bestTriangle = findTriangleWithMinMedian(real_points, countTriangles, countDegenerates);
+
+    if (countDegenerates == countTriangles) {
+        QMessageBox::information(this, "Результат", "Все введенные треугольники являются вырожденными!");
+        return;
     }
-
-
     for (int i = real_points.size() - 1; i >= 0; i--) {
-        if (i != vertexA - 1 && i != vertexB - 1 && i != vertexC - 1) {
+        if (i != bestTriangle.vertexes.A - 1 && i != bestTriangle.vertexes.B - 1 && i != bestTriangle.vertexes.C - 1) {
             real_points.removeAt(i);
             deletePointFromTable(i);
         }
     }
-
-
-
-    cartesian_axis->setTriangle(minA, minB, minC);
-    cartesian_axis->setMedian(QPointF(minMedianStart.x(), minMedianStart.y()), QPointF(minMedianEnd.x(), minMedianEnd.y()));
+    cartesian_axis->setTriangle(bestTriangle.triangle);
+    cartesian_axis->setMedian(bestTriangle.median);
     cartesian_axis->deleteNotTriangle();
     cartesian_axis->resetScale();
 
-    QMessageBox::information(this, "Результат", QString("Треугольник с минимальной медианой: \n"
+    QMessageBox::information(this, "Результат", QString("Не вырожденный треугольник с минимальной медианой: \n"
                                                         "%1(%2, %3)\n%4(%5, %6)\n%7(%8, %9)\n"
-                                                        "Минимальная медиана: %10")
-                             .arg(vertexA)
-                             .arg(minA.x()).arg(minA.y())
-                             .arg(vertexB)
-                             .arg(minB.x()).arg(minB.y())
-                             .arg(vertexC)
-                             .arg(minC.x()).arg(minC.y())
-                             .arg(minMedian));
+                                                        "Минимальная медиана: %10\n"
+                                                        "Количество вырожденных треугольников: %11\n")
+                             .arg(bestTriangle.vertexes.A)
+                             .arg(bestTriangle.triangle.A.x()).arg(bestTriangle.triangle.A.y())
+                             .arg(bestTriangle.vertexes.B)
+                             .arg(bestTriangle.triangle.B.x()).arg(bestTriangle.triangle.B.y())
+                             .arg(bestTriangle.vertexes.C)
+                             .arg(bestTriangle.triangle.C.y()).arg(bestTriangle.triangle.C.y())
+                             .arg(bestTriangle.minMedian)
+                             .arg(countDegenerates));
+
+
+
+
 }
 
 

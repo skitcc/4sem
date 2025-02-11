@@ -7,17 +7,31 @@
 #include <QStandardItemModel>
 
 #include "cartesianWidget.h"
+#include "structs.h"
 
-struct Triangle {
-    QPointF A;
-    QPointF B;
-    QPointF C;
+struct Vertexes {
+    int A;
+    int B;
+    int C;
+
+    Vertexes() : A(-1), B(-1), C(-1) {}
+
+    Vertexes(std::initializer_list<int> list) {
+        auto it = list.begin();
+        if (list.size() >= 1) A = *it++;
+        if (list.size() >= 2) B = *it++;
+        if (list.size() >= 3) C = *it;
+    }
 };
 
 
-struct Median {
-    QPointF startMedian;
-    QPointF endMedian;
+struct TriangleWithMedian {
+    Triangle triangle;
+    Median median;
+    double minMedian;
+    Vertexes vertexes;
+
+    TriangleWithMedian(): minMedian(std::numeric_limits<double>::max()) {}
 };
 
 QT_BEGIN_NAMESPACE

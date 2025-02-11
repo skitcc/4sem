@@ -15,7 +15,8 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    cartesianWidget.h
+    cartesianWidget.h \
+    structs.h
 
 FORMS += \
     mainwindow.ui

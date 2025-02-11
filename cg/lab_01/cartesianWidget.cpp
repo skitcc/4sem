@@ -34,28 +34,39 @@ void CartesianAxis::deleteNotTriangle() {
     for (int i = points.size() - 1; i >= 0; i--) {
         bool isInTriangle = false;
 
-        for (int j = 0; j < triangle_points.size(); j++) {
-            if (std::abs(points[i].x() - triangle_points[j].x()) < EPS &&  
-                std::abs(points[i].y() - triangle_points[j].y()) < EPS) {
-                isInTriangle = true;
-                break;
-            }
-        }
+        if (std::abs(points[i].x() - triangle.A.x()) < EPS &&  
+            std::abs(points[i].y() - triangle.A.y()) < EPS) {
+            isInTriangle = true;
+            };
+
+        if (std::abs(points[i].x() - triangle.B.x()) < EPS &&  
+            std::abs(points[i].y() - triangle.B.y()) < EPS) {
+            isInTriangle = true;
+            };
+
+        if (std::abs(points[i].x() - triangle.C.x()) < EPS &&  
+            std::abs(points[i].y() - triangle.C.y()) < EPS) {
+            isInTriangle = true;
+            };
+
 
         if (!isInTriangle) {
             points.removeAt(i);
+        };
+
         }
-    }
+
     update();
 }
 
 void CartesianAxis::updateOffsets() {
 
-    const double minX = std::min({triangle_points[0].x(), triangle_points[1].x(), triangle_points[2].x()});
-    const double maxX = std::max({triangle_points[0].x(), triangle_points[1].x(), triangle_points[2].x()});
 
-    const double minY = std::min({triangle_points[0].y(), triangle_points[1].y(), triangle_points[2].y()});
-    const double maxY = std::max({triangle_points[0].y(), triangle_points[1].y(), triangle_points[2].y()});
+    const double minX = std::min({triangle.A.x(), triangle.B.x(), triangle.C.x()});
+    const double maxX = std::max({triangle.A.x(), triangle.B.x(), triangle.C.x()});
+
+    const double minY = std::min({triangle.A.y(), triangle.B.y(), triangle.C.y()});
+    const double maxY = std::max({triangle.A.y(), triangle.B.y(), triangle.C.y()});
 
     const double mathOriginX = (minX + maxX) / 2.0;
     const double mathOriginY = (minY + maxY) / 2.0;
@@ -77,15 +88,15 @@ void CartesianAxis::resetScale() {
 
 
 void CartesianAxis::autoScale() {
-    if (triangle_points.size() != 3 || median_points.size() != 2 || isAutoScaled)
+    if (!triangle.isValid || !median.isValid || isAutoScaled)
         return;
 
     qDebug() << "autoScale triggered";
-    const double minX = std::min({triangle_points[0].x(), triangle_points[1].x(), triangle_points[2].x()});
-    const double maxX = std::max({triangle_points[0].x(), triangle_points[1].x(), triangle_points[2].x()});
+    const double minX = std::min({triangle.A.x(), triangle.B.x(), triangle.C.x()});
+    const double maxX = std::max({triangle.A.x(), triangle.B.x(), triangle.C.x()});
 
-    const double minY = std::min({triangle_points[0].y(), triangle_points[1].y(), triangle_points[2].y()});
-    const double maxY = std::max({triangle_points[0].y(), triangle_points[1].y(), triangle_points[2].y()});
+    const double minY = std::min({triangle.A.y(), triangle.B.y(), triangle.C.y()});
+    const double maxY = std::max({triangle.A.y(), triangle.B.y(), triangle.C.y()});
 
     const double deltaX = maxX - minX;
     const double deltaY = maxY - minY;
@@ -115,17 +126,18 @@ QPointF CartesianAxis::convertPixToMath(QPointF point) {
 
 QPointF CartesianAxis::convertMathToPix(const QPointF& mathPoint) {
 
-    double midX = (triangle_points[0].x() + triangle_points[1].x() + triangle_points[2].x()) / 3.0;
-    double midY = (triangle_points[0].y() + triangle_points[1].y() + triangle_points[2].y()) / 3.0;
+    double midX = (triangle.A.x() + triangle.B.x() + triangle.C.x()) / 3.0;
+    double midY = (triangle.A.y() + triangle.B.y() + triangle.C.y()) / 3.0;
     return QPointF(centerX + static_cast<int>((mathPoint.x() - midX) * scale)
                   ,centerY - static_cast<int>((mathPoint.y() - midY) * scale));
 }
 
 
+
 void CartesianAxis::formTriangle(QPainter& painter) {
-    QPointF A = convertMathToPix(triangle_points[0]);
-    QPointF B = convertMathToPix(triangle_points[1]);
-    QPointF C = convertMathToPix(triangle_points[2]);
+    QPointF A = convertMathToPix(triangle.A);
+    QPointF B = convertMathToPix(triangle.B);
+    QPointF C = convertMathToPix(triangle.C);
 
     painter.setPen(Qt::red);
     painter.drawLine(A, B);
@@ -151,20 +163,20 @@ void CartesianAxis::formTriangle(QPainter& painter) {
     };
 
     painter.drawEllipse(A, 3, 3);
-    painter.drawText(adjustTextPosition(A), QString("1 (%1, %2)").arg(triangle_points[0].x(), 0, 'f', 2).arg(triangle_points[0].y(), 0, 'f', 2));
+    painter.drawText(adjustTextPosition(A), QString("1 (%1, %2)").arg(triangle.A.x(), 0, 'f', 2).arg(triangle.A.y(), 0, 'f', 2));
 
     painter.drawEllipse(B, 3, 3);
-    painter.drawText(adjustTextPosition(B), QString("2 (%1, %2)").arg(triangle_points[1].x(), 0, 'f', 2).arg(triangle_points[1].y(), 0, 'f', 2));
+    painter.drawText(adjustTextPosition(B), QString("2 (%1, %2)").arg(triangle.B.x(), 0, 'f', 2).arg(triangle.B.y(), 0, 'f', 2));
 
     painter.drawEllipse(C, 3, 3);
-    painter.drawText(adjustTextPosition(C), QString("3 (%1, %2)").arg(triangle_points[2].x(), 0, 'f', 2).arg(triangle_points[2].y(), 0, 'f', 2));
+    painter.drawText(adjustTextPosition(C), QString("3 (%1, %2)").arg(triangle.C.x(), 0, 'f', 2).arg(triangle.C.y(), 0, 'f', 2));
 }
 
 
 
 void CartesianAxis::formMedian(QPainter& painter) {
-    QPointF startMedian = convertMathToPix(median_points[0]);
-    QPointF endMedian = convertMathToPix(median_points[1]);
+    QPointF startMedian = convertMathToPix(median.startMedian);
+    QPointF endMedian = convertMathToPix(median.endMedian);
 
     painter.drawLine(startMedian, endMedian);
 }
@@ -222,19 +234,21 @@ void CartesianAxis::formDots(QPainter& painter) {
 void CartesianAxis::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 
-    autoScale();
-
     qDebug() << "init scale " << scale;
 
     QPainter painter(this);
     formAxis(painter);
     formDots(painter);
-    if (triangle_points.size() == 3) {
+
+    autoScale();
+
+    if (triangle.isValid) {
         painter.setPen(Qt::red);
         formTriangle(painter);
         painter.setPen(Qt::blue);
         formMedian(painter);
     }
+
 
 }
 
@@ -249,13 +263,13 @@ void CartesianAxis::deletePointAt(const double x, const double y) {
     }
 }
 
-void CartesianAxis::setTriangle(const QPointF& a, const QPointF& b, const QPointF& c) {
-    triangle_points = {a, b, c};
+void CartesianAxis::setTriangle(Triangle import_triangle) {
+    triangle = import_triangle;
     update();
 }
 
-void CartesianAxis::setMedian(const QPointF& a, const QPointF& b) {
-    median_points = {a, b};
+void CartesianAxis::setMedian(Median import_median) {
+    median = import_median;
     update();
 }
 
@@ -294,8 +308,8 @@ void CartesianAxis::mousePressEvent(QMouseEvent *event) {
 
 void CartesianAxis::deletePoints() {
     points.clear();
-    triangle_points.clear();
-    median_points.clear();
+    triangle.reset();
+    median.reset();
     resetScale();
     update();
 }
