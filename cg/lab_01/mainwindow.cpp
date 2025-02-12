@@ -23,13 +23,17 @@ MainWindow::MainWindow(QWidget *parent)
     cartesian_axis->setGeometry(ui->cartesianWidget->geometry());
 
 
+    cartesian_grid = new CartesianGrid();  
+    triangleManager = new TriangleManager(); 
+
     table = new QStandardItemModel(this);
-    table->setColumnCount(2);
-    table->setHorizontalHeaderLabels({"X", "Y"});
+    table->setColumnCount(3);
+    table->setHorizontalHeaderLabels({"№", "X", "Y"});
 
     ui->tableView->setModel(table);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->tableView->setColumnWidth(0, 40);
 
 
     ui->lineEdit_1->setPlaceholderText("Введите x");
@@ -64,10 +68,11 @@ void MainWindow::onButtonPush() {
 
     int row = table->rowCount();
     table->insertRow(row);
-    table->setItem(row, 0, new QStandardItem(QString::number(x)));        
-    table->setItem(row, 1, new QStandardItem(QString::number(y)));  
+    table->setItem(row, 0, new QStandardItem(QString::number(row + 1)));
+    table->setItem(row, 1, new QStandardItem(QString::number(x)));        
+    table->setItem(row, 2, new QStandardItem(QString::number(y)));  
 
-    cartesian_axis->addPoint(x, y);  
+    cartesian_grid->addPoint(x, y);  
 
     QMessageBox::information(this, "Успех", QString("Точка (%1, %2) добавлена!").arg(x).arg(y));
 }
@@ -77,20 +82,29 @@ void MainWindow::resetScale() {
 }
 
 
+void MainWindow::paintEvent(QPaintEvent *event) {
+    QMainWindow::paintEvent(event);
+    ui->tableView->setColumnWidth(0, 40);
+}
+
+
+
 void MainWindow::addPointFromClick(double x, double y) {
-    cartesian_axis->addPoint(x, y);
+    cartesian_grid->addPoint(x, y);
     int row = table->rowCount();
     table->insertRow(row);
-    table->setItem(row, 0, new QStandardItem(QString::number(x)));        
-    table->setItem(row, 1, new QStandardItem(QString::number(y)));  
+
+    table->setItem(row, 0, new QStandardItem(QString::number(row + 1)));
+    table->setItem(row, 1, new QStandardItem(QString::number(x)));        
+    table->setItem(row, 2, new QStandardItem(QString::number(y)));  
 }
 
 
 void MainWindow::deleteAllPoints(void) {
-    cartesian_axis->deletePoints();
+    cartesian_grid->deletePoints();
     table->clear();
-    table->setColumnCount(2);
-    table->setHorizontalHeaderLabels({"X", "Y"});
+    table->setColumnCount(3);
+    table->setHorizontalHeaderLabels({"№", "X", "Y"});
     points.clear();
     ui->lineEdit_1->clear();
     ui->lineEdit_2->clear();
@@ -105,15 +119,15 @@ void MainWindow::editPointFromCanvas(double x, double y) {
 
 
     if (okX && okY) {
-        cartesian_axis->deletePointAt(x, y);
-        cartesian_axis->addPoint(newX, newY);
+        cartesian_grid->deletePointAt(x, y);
+        cartesian_grid->addPoint(newX, newY);
 
         for (int i = 0; i < table->rowCount(); i++) {
-            double tableX = table->item(i, 0)->text().toDouble();
-            double tableY = table->item(i, 1)->text().toDouble();
+            double tableX = table->item(i, 1)->text().toDouble();
+            double tableY = table->item(i, 2)->text().toDouble();
             if (std::abs(tableX - x) < 1e-6 && std::abs(tableY - y) < 1e-6) {
-                table->item(i, 0)->setText(QString::number(newX));
-                table->item(i, 1)->setText(QString::number(newY));
+                table->item(i, 1)->setText(QString::number(newX));
+                table->item(i, 2)->setText(QString::number(newY));
                 break;
             }
         }
@@ -133,8 +147,8 @@ void MainWindow::deletePointFromCanvas(double x, double y) {
     int row = -1;
 
     for (int i = 0; i < table->rowCount(); ++i) {
-        double tableX = table->item(i, 0)->text().toDouble();
-        double tableY = table->item(i, 1)->text().toDouble();
+        double tableX = table->item(i, 1)->text().toDouble();
+        double tableY = table->item(i, 2)->text().toDouble();
 
         if (std::abs(tableX - x) <= EPS && std::abs(tableY - y) <= EPS) {
             row = i;
@@ -151,7 +165,7 @@ void MainWindow::deletePointFromCanvas(double x, double y) {
             }
         }
 
-        cartesian_axis->deletePointAt(x, y);
+        cartesian_grid->deletePointAt(x, y);
     }
 }
 
@@ -174,8 +188,8 @@ void MainWindow::showTableContextMenu(const QPoint &pos) {
 
 
 void MainWindow::editPointFromTable(int row) {
-    double x = table->item(row, 0)->text().toDouble();
-    double y = table->item(row, 1)->text().toDouble();
+    double x = table->item(row, 1)->text().toDouble();
+    double y = table->item(row, 2)->text().toDouble();
 
     bool okX, okY;
     double newX = QInputDialog::getDouble(this, "Изменить координату X",
@@ -184,20 +198,20 @@ void MainWindow::editPointFromTable(int row) {
                                           "Введите новое значение Y:", y, -1000, 1000, 2, &okY);
 
     if (okX && okY) {
-        table->item(row, 0)->setText(QString::number(newX));
-        table->item(row, 1)->setText(QString::number(newY));
-        cartesian_axis->deletePointAt(x, y);
-        cartesian_axis->addPoint(newX, newY);
+        table->item(row, 1)->setText(QString::number(newX));
+        table->item(row, 2)->setText(QString::number(newY));
+        cartesian_grid->deletePointAt(x, y);
+        cartesian_grid->addPoint(newX, newY);
     }
 }
 
 
 
 void MainWindow::deletePointFromTable(int row) {
-    double x = table->item(row, 0)->text().toDouble();
-    double y = table->item(row, 1)->text().toDouble();
+    double x = table->item(row, 1)->text().toDouble();
+    double y = table->item(row, 2)->text().toDouble();
     table->removeRow(row);
-    cartesian_axis->deletePointAt(x, y);
+    cartesian_grid->deletePointAt(x, y);
 }
 
 
@@ -266,7 +280,7 @@ TriangleWithMedian findTriangleWithMinMedian(const QVector<QPointF>& points, int
                     bestTriangle.minMedian = median;
                     bestTriangle.triangle = {triangle.A, triangle.B, triangle.C};
                     bestTriangle.median = {medianVertexes.startMedian, medianVertexes.endMedian};
-                    bestTriangle.vertexes = {i + 1, j + 1, k + 1};
+                    bestTriangle.triangle.vertexes = {i + 1, j + 1, k + 1};
                 }
             }
         }
@@ -283,12 +297,10 @@ void MainWindow::onButtonSolve() {
     QVector<QPointF> real_points;
 
     for (int i = 0; i < table->rowCount(); ++i) {
-        double tableX = table->item(i, 0)->text().toDouble();
-        double tableY = table->item(i, 1)->text().toDouble();
+        double tableX = table->item(i, 1)->text().toDouble();
+        double tableY = table->item(i, 2)->text().toDouble();
         real_points.append(QPointF{tableX, tableY});
     }
-
-    double minMedian = std::numeric_limits<double>::max();
 
     if (real_points.size() < 3) {
         QMessageBox::warning(this, "Ошибка", "Недостаточно точек для построения треугольника!");
@@ -306,13 +318,13 @@ void MainWindow::onButtonSolve() {
         return;
     }
     for (int i = real_points.size() - 1; i >= 0; i--) {
-        if (i != bestTriangle.vertexes.A - 1 && i != bestTriangle.vertexes.B - 1 && i != bestTriangle.vertexes.C - 1) {
+        if (i != bestTriangle.triangle.vertexes.numA - 1 && i != bestTriangle.triangle.vertexes.numB - 1 && i != bestTriangle.triangle.vertexes.numC - 1) {
             real_points.removeAt(i);
             deletePointFromTable(i);
         }
     }
-    cartesian_axis->setTriangle(bestTriangle.triangle);
-    cartesian_axis->setMedian(bestTriangle.median);
+    triangleManager->setTriangle(bestTriangle.triangle);
+    triangleManager->setMedian(bestTriangle.median);
     cartesian_axis->deleteNotTriangle();
     cartesian_axis->resetScale();
 
@@ -320,11 +332,11 @@ void MainWindow::onButtonSolve() {
                                                         "%1(%2, %3)\n%4(%5, %6)\n%7(%8, %9)\n"
                                                         "Минимальная медиана: %10\n"
                                                         "Количество вырожденных треугольников: %11\n")
-                             .arg(bestTriangle.vertexes.A)
+                             .arg(bestTriangle.triangle.vertexes.numA)
                              .arg(bestTriangle.triangle.A.x()).arg(bestTriangle.triangle.A.y())
-                             .arg(bestTriangle.vertexes.B)
+                             .arg(bestTriangle.triangle.vertexes.numB)
                              .arg(bestTriangle.triangle.B.x()).arg(bestTriangle.triangle.B.y())
-                             .arg(bestTriangle.vertexes.C)
+                             .arg(bestTriangle.triangle.vertexes.numC)
                              .arg(bestTriangle.triangle.C.y()).arg(bestTriangle.triangle.C.y())
                              .arg(bestTriangle.minMedian)
                              .arg(countDegenerates));
