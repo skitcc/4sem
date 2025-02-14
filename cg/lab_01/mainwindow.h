@@ -38,9 +38,6 @@ private:
     QVector<QPointF> points;
     CartesianAxis *cartesian_axis;
     QStandardItemModel *table;
-    CartesianGrid *cartesian_grid;
-    TriangleManager *triangleManager;
-
 
 private slots:
     void onButtonPush(void);
@@ -55,8 +52,6 @@ private slots:
 private:
     void editPointFromTable(int row);
     void deletePointFromTable(int row);
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
+    // void paintEvent(QPaintEvent *event) override;
 };
 #endif // MAINWINDOW_H

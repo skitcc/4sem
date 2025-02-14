@@ -4,17 +4,17 @@
 
 #include <QPointF>
 
-
 struct NumVertexes {
     int numA, numB, numC;
-
 };
+
 
 
 struct Triangle {
     QPointF A;
     QPointF B;
     QPointF C;
+
 
     NumVertexes vertexes;
 
@@ -50,11 +50,6 @@ struct Median {
         isValid = false;
     }
 
-};
-
-
-struct Center {
-    int x, y;
 };
 
 
