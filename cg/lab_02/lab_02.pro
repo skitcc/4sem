@@ -10,10 +10,12 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    transformationWidget.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    transformationWidget.h
 
 FORMS += \
     mainwindow.ui
