@@ -11,7 +11,7 @@
 #include "transformationWidget.h"
 
 
-#define TABLEVIEWWIDTH 320
+#define TABLEVIEWWIDTH 317
 
 
 QT_BEGIN_NAMESPACE
@@ -27,6 +27,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private slots:
+    void applyTransponse();
+    void applyScale();
+    void applyRotate();
+    void applyUndo();
 
 private:
     QStandardItemModel *tableTransponse;

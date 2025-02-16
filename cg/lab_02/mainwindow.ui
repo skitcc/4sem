@@ -35,7 +35,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTableView" name="scalingButton"/>
+      <widget class="QTableView" name="tableScaling"/>
      </item>
      <item>
       <widget class="QPushButton" name="scalingButton">
@@ -55,7 +55,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="rewindButton">
+      <widget class="QPushButton" name="undoButton">
        <property name="text">
         <string>Вернуться назад</string>
        </property>
