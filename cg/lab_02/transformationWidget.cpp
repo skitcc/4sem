@@ -29,6 +29,7 @@ void Transformation::saveState() {
     historyEllipses.push(ellipses);
     historyTriangles.push(triangles);
     historyLines.push(lines);
+    historyAngles.push(lastRotationAngle);
 }
 
 
@@ -41,6 +42,7 @@ void Transformation::undo() {
         historyEllipses.pop();
         historyTriangles.pop();
         historyLines.pop();
+        historyAngles.pop();
 
         update();
     }
@@ -81,7 +83,7 @@ void Transformation::setShapePoints() {
 
     double headXMath, headYMath;
     pixToMath(centerX, centerY, headXMath, headYMath);
-    ellipses.push_back({headXMath, headYMath, 1.0, 80, 100});  // Эллипс (центр + радиусы)
+    ellipses.push_back({headXMath, headYMath, 1.0, 80, 100});
 
     std::vector<std::pair<int, int>> pixelEyes = {
         {centerX - 30, centerY - 30},
@@ -90,7 +92,7 @@ void Transformation::setShapePoints() {
     for (const auto& [xPix, yPix] : pixelEyes) {
         double xMath, yMath;
         pixToMath(xPix, yPix, xMath, yMath);
-        ellipses.push_back({xMath, yMath, 1.0, 15, 10, 0.0});  // Эллипсы (центр + радиусы)
+        ellipses.push_back({xMath, yMath, 1.0, 15, 10, 0.0});
     }
 
     std::vector<std::pair<int, int>> pixelNose = {
@@ -370,6 +372,7 @@ void Transformation::rotate(double rx, double ry, double angle) {
 
     qDebug() << angle;
 
+    double newAngle = -angle * M_PI / 180;
 
     rx = (rx > 0 ? 1 : -1) * std::abs(rx) * 20 * scaleX;
     ry = (ry > 0 ? 1 : -1) * std::abs(ry) * 20 * scaleY;
@@ -377,14 +380,15 @@ void Transformation::rotate(double rx, double ry, double angle) {
     qDebug() << rx << ry;
 
     const std::vector<std::vector<double>> rotationMatrix {
-        {cos(angle), -sin(angle), 0},
-        {sin(angle), cos(angle), 0},
+        {cos(newAngle), -sin(newAngle), 0},
+        {sin(newAngle), cos(newAngle), 0},
         {0, 0, 1}
     };
 
     rotateEllipses(rx, ry, rotationMatrix, angle);
     rotateTriangles(rx, ry, rotationMatrix);
     rotateLines(rx, ry, rotationMatrix);
+    lastRotationAngle += angle;
 }
 
 
@@ -399,11 +403,11 @@ void Transformation::drawShape(QPainter& painter) {
         mathToPix(ellipse[0], ellipse[1], centerX, centerY);
         int rx = ellipse[3];
         int ry = ellipse[4]; 
-        double angle = ellipse[5] * 180.0 / M_PI;
+        // double angle = ellipse[5] * 180.0 / M_PI;
 
         painter.save();
         painter.translate(centerX, centerY);
-        painter.rotate(angle);
+        painter.rotate(ellipse[5]);
         painter.drawEllipse(QPoint(0, 0), rx, ry);
         painter.restore();
     }

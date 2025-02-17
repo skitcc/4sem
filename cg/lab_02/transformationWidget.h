@@ -72,10 +72,12 @@ private:
     std::stack<std::vector<std::vector<double>>> historyEllipses;
     std::stack<std::vector<std::vector<double>>> historyTriangles;
     std::stack<std::vector<std::vector<double>>> historyLines;
+    std::stack<double> historyAngles;
 
     double centerX, centerY;
     double scaleX = 1.0, scaleY = 1.0;
     double lastCx = 0.0, lastCy = 0.0;
+    double lastRotationAngle = 0.0;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
