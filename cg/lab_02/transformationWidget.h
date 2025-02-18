@@ -10,6 +10,8 @@
 #include <cmath>
 #include <stack>
 
+
+
 #define DEFAULT_VECTOR_SIZE 3
 
 

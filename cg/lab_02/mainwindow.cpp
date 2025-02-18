@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     tableTransponse->setColumnCount(2);
     tableTransponse->setHorizontalHeaderLabels({"dx", "dy"});
     ui->tableTransposition->setModel(tableTransponse);
+    ui->tableTransposition->verticalHeader()->hide();
+
 
     for (int column = 0; column < 2; column++) {
         ui->tableTransposition->setColumnWidth(column, TABLEVIEWWIDTH / 2);
@@ -32,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
     tableScale->setColumnCount(4);
     tableScale->setHorizontalHeaderLabels({"kx", "ky", "cx", "cy"});
     ui->tableScaling->setModel(tableScale);
+    ui->tableScaling->verticalHeader()->hide();
+
 
     for (int column = 0; column < 4; column++) {
         ui->tableScaling->setColumnWidth(column, TABLEVIEWWIDTH / 4);
@@ -44,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
     tableRotate->setColumnCount(3);
     tableRotate->setHorizontalHeaderLabels({"rx", "ry", "angle"});
     ui->tableRotate->setModel(tableRotate);
+    ui->tableRotate->verticalHeader()->hide();
+
 
     for (int column = 0; column < 3; column++) {
         ui->tableRotate->setColumnWidth(column, TABLEVIEWWIDTH / 3);

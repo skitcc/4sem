@@ -83,7 +83,7 @@ void Transformation::setShapePoints() {
 
     double headXMath, headYMath;
     pixToMath(centerX, centerY, headXMath, headYMath);
-    ellipses.push_back({headXMath, headYMath, 1.0, 80, 100});
+    ellipses.push_back({headXMath, headYMath, 1.0, 80, 100, 0.0});
 
     std::vector<std::pair<int, int>> pixelEyes = {
         {centerX - 30, centerY - 30},
@@ -315,7 +315,6 @@ void Transformation::rotateEllipses(double rx, double ry, std::vector<std::vecto
         point[0] = newPoint[0] + rx;
         point[1] = newPoint[1] + ry;
         point[5] += angle;
-
     }
 }
 
