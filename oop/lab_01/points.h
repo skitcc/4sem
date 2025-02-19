@@ -14,6 +14,10 @@ typedef struct points
 
 
 
+void set_default_points(points_t &points);
+error_t read_all_points(FILE *file, points_t &points);
+void free_points(points_t &points);
+
 error_t rotate_points(points_t &points, const point_t &center, const rotate_t &rotate_params);
 error_t transponse_points(points_t &points, const transponse_t &transponse_params);
 error_t scale_points(points_t &points, const point_t &center, const scale_t &scale_params);

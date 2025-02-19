@@ -57,3 +57,8 @@ void scale_point(point_t &point, const point_t &center, const scale_t &scale_par
     point.y = (point.y - center.y) * scale_params.ky + center.y;
     point.z = (point.z - center.z) * scale_params.kz + center.z; 
 }
+
+void set_default_point(point_t &point)
+{
+    point = {0, 0, 0};
+}

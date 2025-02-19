@@ -32,13 +32,13 @@ void free_points(points_t &points)
 
 
 
-error_t read_amount_of_points(FILE *file, points_t &points)
+error_t read_amount_of_points(FILE *file, int &size)
 {
     if (!file)
         return ERR_RECEIVE_FILE;
     
     error_t rc = SUCCESS;
-    if (fscanf(file, "%d", points.size) != 1)
+    if (fscanf(file, "%d", &size) != 1)
         rc = ERR_AMOUNT;
     return rc;
 }
@@ -51,7 +51,7 @@ error_t read_point(FILE *file, point_t &point)
     
     point_t temp_point;
     error_t rc = SUCCESS;
-    if (fscanf(file, "%ld %ld %ld", &temp_point.x, &temp_point.y, &temp_point.z) != 3)
+    if (fscanf(file, "%ld%ld%ld", &temp_point.x, &temp_point.y, &temp_point.z) != 3)
         rc = ERR_POINTS_DATA;
     else
         point = temp_point;
@@ -65,7 +65,7 @@ error_t read_all_points(FILE *file, points_t &points)
         return ERR_RECEIVE_FILE;
 
     error_t rc = SUCCESS;
-    if (read_amount_of_points(file, points))
+    if (read_amount_of_points(file, points.size))
         rc = ERR_AMOUNT;
     else
     {

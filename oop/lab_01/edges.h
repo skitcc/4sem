@@ -22,11 +22,11 @@ typedef struct edges
 } edges_t;
 
 
-error_t read_amount_edges();
-error_t read_edges();
 
 
-
+error_t read_all_edges(FILE *file, edges_t &edges);
+void set_default_edges(edges_t &edges);
+void free_edges(edges &edges);
 
 
 

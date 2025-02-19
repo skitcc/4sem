@@ -2,8 +2,7 @@
 #define BASE_SAMPLES_H
 
 
-
-typedef struct point
+typedef struct
 {
     double x, y, z;
 } point_t;
@@ -22,6 +21,14 @@ typedef struct
 {
     double angle_x, angle_y, angle_z;
 } rotate_t;
+
+typedef struct 
+{
+    points_t points;
+    edges_t edges;
+    point_t center;
+} figure_t;
+
 
 
 
