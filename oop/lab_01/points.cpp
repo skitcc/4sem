@@ -32,7 +32,7 @@ void free_points(points_t &points)
 
 
 
-errors read_amount_of_points(FILE *file, int &size)
+errors read_amount_of_points(FILE *file, size_t &size)
 {
     if (!file)
         return ERR_RECEIVE_FILE;

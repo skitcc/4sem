@@ -8,8 +8,7 @@ static double to_radians(const double &angle) {
 
 static angle_components_t calculate_angles(const double angle)
 {
-    angle_components_t angles = {cos(to_radians(angle)), sin(to_radians(angle))};
-    return angles;
+    return (angle_components_t){cos(to_radians(angle)), sin(to_radians(angle))};
 }
 
 static void rotate_x_axis(point_t &point, const point_t &center, const double angle)

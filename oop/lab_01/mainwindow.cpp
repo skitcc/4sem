@@ -58,11 +58,10 @@ MainWindow::MainWindow(QWidget *parent)
     scene = new QGraphicsScene();
     ui->planeWidget->setScene(scene);
     scene->setBackgroundBrush(Qt::white);
-    size_t
     if (!scene)
         qDebug() << "scene not valid";
 
-    set_figure(figure, "../data/pyramid.txt");
+    set_figure(figure, "../data/cube3D.txt");
 
     connect(ui->transpositionButton, &QPushButton::clicked, this, &MainWindow::applyTransponse);
     connect(ui->scalingButton, &QPushButton::clicked, this, &MainWindow::applyScale);
