@@ -10,10 +10,24 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    draw.cpp \
+    edges.cpp \
+    points.cpp \
+    figure.cpp \
+    points_operations.cpp \
+    ./errorModule/errors.cpp 
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    draw.h \
+    edges.h \
+    points.h \
+    figure.h \
+    points_operations.h \
+    base_samples.h \
+    ./errorModule/errors.h 
+    
 
 FORMS += \
     mainwindow.ui

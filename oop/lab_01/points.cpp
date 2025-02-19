@@ -1,12 +1,12 @@
 #include "points.h"
 
 
-error_t allocate_points(points_t &points)
+errors allocate_points(points_t &points)
 {
     if (points.size <= 0)
         return ERR_AMOUNT;
     
-    error_t rc = SUCCESS;
+    errors rc = SUCCESS;
     
     point_t *temp_array_of_points = (point_t *)malloc(points.size * sizeof(point_t));
     if (!temp_array_of_points)
@@ -32,40 +32,44 @@ void free_points(points_t &points)
 
 
 
-error_t read_amount_of_points(FILE *file, int &size)
+errors read_amount_of_points(FILE *file, int &size)
 {
     if (!file)
         return ERR_RECEIVE_FILE;
     
-    error_t rc = SUCCESS;
+    errors rc = SUCCESS;
     if (fscanf(file, "%d", &size) != 1)
         rc = ERR_AMOUNT;
     return rc;
 }
 
 
-error_t read_point(FILE *file, point_t &point) 
+errors read_point(FILE *file, point_t &point) 
 {
     if (!file)
         return ERR_RECEIVE_FILE;
     
     point_t temp_point;
-    error_t rc = SUCCESS;
-    if (fscanf(file, "%ld%ld%ld", &temp_point.x, &temp_point.y, &temp_point.z) != 3)
+    errors rc = SUCCESS;
+    if (fscanf(file, "%lf %lf %lf", &temp_point.x, &temp_point.y, &temp_point.z) != 3)
+    {
         rc = ERR_POINTS_DATA;
+    }
     else
+    {
         point = temp_point;
+    }
     return rc;
 }
 
 
-error_t read_all_points(FILE *file, points_t &points)
+errors read_all_points(FILE *file, points_t &points)
 {
     if (!file)
         return ERR_RECEIVE_FILE;
 
-    error_t rc = SUCCESS;
-    if (read_amount_of_points(file, points.size))
+    errors rc = SUCCESS;
+    if (read_amount_of_points(file, points.size) != SUCCESS)
         rc = ERR_AMOUNT;
     else
     {
@@ -76,6 +80,7 @@ error_t read_all_points(FILE *file, points_t &points)
             for (size_t i = 0; i < points.size; i++)
             {
                 rc = read_point(file, points.array_of_points[i]); 
+                // qDebug() << "current data : " << points.array_of_points[i].x;
                 if (rc)
                     free_points(points);
             }
@@ -85,7 +90,7 @@ error_t read_all_points(FILE *file, points_t &points)
 }
 
 
-error_t rotate_points(points_t &points, const point_t &center, const rotate_t &rotate_params)
+errors rotate_points(points_t &points, const point_t &center, const rotate_t &rotate_params)
 {
     if (!points.array_of_points)
         return ERR_LOAD_DATA;
@@ -97,7 +102,7 @@ error_t rotate_points(points_t &points, const point_t &center, const rotate_t &r
 }
 
 
-error_t transponse_points(points_t &points, const transponse_t &transponse_params)
+errors transponse_points(points_t &points, const transponse_t &transponse_params)
 {
     if (!points.array_of_points)
         return ERR_LOAD_DATA;
@@ -108,7 +113,7 @@ error_t transponse_points(points_t &points, const transponse_t &transponse_param
     return SUCCESS;
 }
 
-error_t scale_points(points_t &points, const point_t &center, const scale_t &scale_params)
+errors scale_points(points_t &points, const point_t &center, const scale_t &scale_params)
 {
     if (!points.array_of_points)
         return ERR_LOAD_DATA;

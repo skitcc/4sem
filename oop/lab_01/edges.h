@@ -24,7 +24,7 @@ typedef struct edges
 
 
 
-error_t read_all_edges(FILE *file, edges_t &edges);
+errors read_all_edges(FILE *file, edges_t &edges);
 void set_default_edges(edges_t &edges);
 void free_edges(edges &edges);
 

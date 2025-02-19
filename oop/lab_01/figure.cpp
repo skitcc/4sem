@@ -1,7 +1,7 @@
 #include "figure.h"
 
 
-figure_t &init_figure()
+figure_t init_figure()
 {
     figure_t figure;
     set_default_point(figure.center);
@@ -11,19 +11,28 @@ figure_t &init_figure()
     return figure;
 }
 
-static error_t read_figure(FILE *file, figure_t &figure)
+static errors read_figure(FILE *file, figure_t &figure)
 {
     if (!file)
         return ERR_RECEIVE_FILE;
 
     figure = init_figure();
-    error_t rc = SUCCESS;
-    if (rc = read_all_points(file, figure.points))
+    errors rc = read_all_points(file, figure.points);
+    qDebug() << "rc : " << rc;
+
+
+    if (rc == SUCCESS)
     {
         rc = read_all_edges(file, figure.edges);
-        if (!rc)
+
+        // for (int i = 0; i < figure.edges.size; i++) {
+        //     qDebug() << "figure edge x y : " << figure.edges.array_of_edges[i].start_edge << figure.edges.array_of_edges[i].end_edge;
+        // }
+        if (rc)   
             free_points(figure.points);
     }
+
+
     return rc;
 }
 
@@ -35,12 +44,19 @@ void free_figure(figure_t &figure)
 }
 
 
-error_t set_figure(figure_t &figure, const char *filename)
+errors set_figure(figure_t &figure, const char *filename)
 {
+    if (!filename)
+        return ERR_RECEIVE_FILE;
+
     FILE *file = fopen(filename, "r");
-    error_t rc = SUCCESS;
+    // qDebug() << "alooooo";
+    errors rc = SUCCESS;
     if (!file)
+    {
+        // qDebug() << "alooooo";
         rc = ERR_OPEN_FILE;
+    }
     else
     {
         figure_t temp_figure;
@@ -49,12 +65,12 @@ error_t set_figure(figure_t &figure, const char *filename)
         if (rc == SUCCESS)
         {
             figure = temp_figure;
-            free_figure(temp_figure);
         }
         
     }
     return rc;
 }
+
 
 
 void transponse_figure(figure_t &figure, const transponse_t &transponse_params)

@@ -3,8 +3,9 @@
 
 
 #include <QMessageBox>
+#include <QDebug>
 
-enum error_t
+enum errors
 {
     SUCCESS,
     ERR_RECEIVE_FILE,
@@ -14,15 +15,13 @@ enum error_t
     ERR_EDGES_SIZE,
     ERR_ALLOCATION,
     ERR_POINTS_DATA,
-    ERR_LOAD_DATA
-
-
-
+    ERR_LOAD_DATA,
+    ERR_WRONG_SCENE
 
 };
 
 
-void handle_errors(error_t &error);
+void handle_errors(errors &error);
 
 
 #endif

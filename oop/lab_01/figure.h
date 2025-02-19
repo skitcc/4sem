@@ -7,7 +7,15 @@
 #include "points.h"
 
 
-error_t set_figure(figure_t &figure, const char *filename);
+
+typedef struct 
+{
+    points_t points;
+    edges_t edges;
+    point_t center;
+} figure_t;
+
+errors set_figure(figure_t &figure, const char *filename);
 void free_figure(figure_t &figure);
 
 void transponse_figure(figure_t &figure, const transponse_t &transponse_params);

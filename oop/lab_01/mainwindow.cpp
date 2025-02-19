@@ -54,12 +54,40 @@ MainWindow::MainWindow(QWidget *parent)
 
     }
 
+
+    scene = new QGraphicsScene();
+    ui->planeWidget->setScene(scene);
+    scene->setBackgroundBrush(Qt::white);
+    size_t
+    if (!scene)
+        qDebug() << "scene not valid";
+
+    set_figure(figure, "../data/pyramid.txt");
+
     connect(ui->transpositionButton, &QPushButton::clicked, this, &MainWindow::applyTransponse);
     connect(ui->scalingButton, &QPushButton::clicked, this, &MainWindow::applyScale);
     connect(ui->rotationButtton, &QPushButton::clicked, this, &MainWindow::applyRotate);
 
 }
 
+
+void MainWindow::paintEvent(QPaintEvent *event) {
+    Q_UNUSED(event);
+
+
+    // qDebug() << "Widget width:" << width() << "Widget height:" << height();
+
+
+    view = {.height = height(), .width = width(), .scene = scene};
+
+    // for (int i = 0; i < figure.points.size; i++)
+    // {
+    //     qDebug() << figure.points.array_of_points[i].x;
+    // }
+
+    draw_figure(figure, view);
+
+}
 
 
 void MainWindow::applyTransponse() {

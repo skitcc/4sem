@@ -6,31 +6,34 @@ static double to_radians(const double &angle) {
 }
 
 
+static angle_components_t calculate_angles(const double angle)
+{
+    angle_components_t angles = {cos(to_radians(angle)), sin(to_radians(angle))};
+    return angles;
+}
+
 static void rotate_x_axis(point_t &point, const point_t &center, const double angle)
 {
-    double r_cos = cos(to_radians(angle));
-    double r_sin = sin(to_radians(angle));
+    angle_components_t angles = calculate_angles(angle);
 
-    point.y = (point.y - center.y) * r_cos + (point.z - center.z) * r_sin + center.y;
-    point.z = -(point.y - center.y) * r_sin + (point.z - center.z) * r_cos + center.z;
+    point.y = (point.y - center.y) * angles.r_cos + (point.z - center.z) * angles.r_sin + center.y;
+    point.z = -(point.y - center.y) * angles.r_sin + (point.z - center.z) * angles.r_cos + center.z;
 }
 
 static void rotate_y_axis(point_t &point, const point_t &center, const double angle)
 {
-    double r_cos = cos(to_radians(angle));
-    double r_sin = sin(to_radians(angle));
+    angle_components_t angles = calculate_angles(angle);
 
-    point.x = (point.x - center.x) * r_cos + (point.z - center.z) * r_sin + center.x;
-    point.z = -(point.x - center.x) * r_sin + (point.z - center.z) * r_cos + center.z;
+    point.x = (point.x - center.x) * angles.r_cos + (point.z - center.z) * angles.r_sin + center.x;
+    point.z = -(point.x - center.x) * angles.r_sin + (point.z - center.z) * angles.r_cos + center.z;
 }
 
 static void rotate_z_axis(point_t &point, const point_t &center, const double angle)
 {
-    double r_cos = cos(to_radians(angle));
-    double r_sin = sin(to_radians(angle));
+    angle_components_t angles = calculate_angles(angle);
 
-    point.x = (point.x - center.x) * r_cos + (point.y - center.y) * r_sin + center.x;
-    point.y = -(point.x - center.x) * r_sin + (point.y - center.y) * r_cos + center.y;
+    point.x = (point.x - center.x) * angles.r_cos + (point.y - center.y) * angles.r_sin + center.x;
+    point.y = -(point.x - center.x) * angles.r_sin + (point.y - center.y) * angles.r_cos + center.y;
 }
 
 

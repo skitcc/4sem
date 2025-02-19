@@ -63,7 +63,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="transformationWidget" native="true">
+   <widget class="QGraphicsView" name="planeWidget" native="true">
     <property name="geometry">
      <rect>
       <x>0</x>

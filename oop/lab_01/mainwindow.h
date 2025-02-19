@@ -4,7 +4,12 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QMessageBox>
+#include <QGraphicsScene>
+#include <QDebug>
+#include <QGraphicsView>
 
+#include "draw.h"
+#include "figure.h"
 
 #define TABLEVIEWWIDTH 317
 
@@ -32,6 +37,13 @@ private:
     QStandardItemModel *tableScale;
     QStandardItemModel *tableRotate;
     QStandardItemModel *tableTransponse;
+    figure_t figure;
+    view_t view;
+    QGraphicsScene *scene;
+
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 
 private:
