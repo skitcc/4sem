@@ -3,20 +3,12 @@
 
 #include <iostream>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    // this->resize(1000, 700);
-
-    // transformationWidget = new Transformation(ui->transformationWidget);
-    // transformationWidget->setGeometry(ui->transformationWidget->geometry());
 
     tableTransponse = new QStandardItemModel(this);
     tableScale = new QStandardItemModel(this);
     tableRotate = new QStandardItemModel(this);
-
 
     tableTransponse->setColumnCount(3);
     tableTransponse->setHorizontalHeaderLabels({"dx", "dy", "dz"});
@@ -27,8 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui->tableTransposition->setColumnWidth(column, TABLEVIEWWIDTH / 3);
         tableTransponse->setItem(0, column, new QStandardItem("0"));
     }
-    
-
 
     tableScale->setColumnCount(4);
     tableScale->setHorizontalHeaderLabels({"kx", "ky", "kz"});
@@ -38,10 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     for (int column = 0; column < 3; column++) {
         ui->tableScaling->setColumnWidth(column, TABLEVIEWWIDTH / 3);
         tableScale->setItem(0, column, new QStandardItem("0"));
-
     }
-    
-
 
     tableRotate->setColumnCount(3);
     tableRotate->setHorizontalHeaderLabels({"angle x", "angle y", "angle z"});
@@ -51,47 +38,28 @@ MainWindow::MainWindow(QWidget *parent)
     for (int column = 0; column < 3; column++) {
         ui->tableRotate->setColumnWidth(column, TABLEVIEWWIDTH / 3);
         tableRotate->setItem(0, column, new QStandardItem("0"));
-
     }
-
 
     scene = new QGraphicsScene();
     ui->planeWidget->setScene(scene);
     scene->setBackgroundBrush(Qt::white);
-    if (!scene)
-        qDebug() << "scene not valid";
 
     set_figure(figure, "../data/pyramid.txt");
 
     connect(ui->transpositionButton, &QPushButton::clicked, this, &MainWindow::applyTransponse);
     connect(ui->scalingButton, &QPushButton::clicked, this, &MainWindow::applyScale);
     connect(ui->rotationButtton, &QPushButton::clicked, this, &MainWindow::applyRotate);
-
 }
-
 
 void MainWindow::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
-
-
-    // qDebug() << "Widget width:" << width() << "Widget height:" << height();
-
-
-
-    // for (int i = 0; i < figure.points.size; i++)
-    // {
-    //     qDebug() << figure.points.array_of_points[i].x;
-    // }
-
     draw_figure(figure, view);
-
 }
 
 void MainWindow::showEvent(QShowEvent *event) {
     Q_UNUSED(event);
     *view = {.height = height(), .width = width(), .scene = scene};
 }
-
 
 void MainWindow::applyTransponse() {
     bool ok1 = false, ok2 = false, ok3 = false;
@@ -104,18 +72,14 @@ void MainWindow::applyTransponse() {
         dz = tableTransponse->item(0, 2)->text().toDouble(&ok3);
     }
 
-
-    if (ok1 && ok2 && ok3)
-    {
+    if (ok1 && ok2 && ok3) {
         transponse_t transponse = {dx, dy, dz};
         transformation_t transformation(transponse, {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0});
         connection_t connection = {view, TRANSPONSE, transformation};
         handle_action(connection, figure);
     }
 
-
     update();
-
 }
 
 void MainWindow::applyScale() {
@@ -134,12 +98,10 @@ void MainWindow::applyScale() {
         transformation_t transformation({0.0, 0.0, 0.0}, scale, {0.0, 0.0, 0.0});
         connection_t connection = {view, SCALE, transformation};
         handle_action(connection, figure);
-    }
-    else {
+    } else {
         QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для масштабирования");
         return;
     }
-
 
     update();
 }
@@ -156,7 +118,7 @@ void MainWindow::applyRotate() {
     }
 
     if (ok1 && ok2 && ok3) {
-        rotate_t rotate  = {angleX, angleY, angleZ};
+        rotate_t rotate = {angleX, angleY, angleZ};
         transformation_t transformation({0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}, rotate);
         connection_t connection = {view, ROTATE, transformation};
         handle_action(connection, figure);
@@ -168,9 +130,9 @@ void MainWindow::applyRotate() {
     update();
 }
 
-
-
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
+    delete tableRotate;
+    delete tableScale;
+    delete tableTransponse;
     delete ui;
 }

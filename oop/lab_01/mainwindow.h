@@ -1,16 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QStandardItemModel>
-#include <QMessageBox>
 #include <QGraphicsScene>
-#include <QDebug>
 #include <QGraphicsView>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QStandardItemModel>
 
-#include "draw.h"
-#include "figure.h"
 #include "actions.h"
+#include "draw.h"
+#include "figure_operations.h"
 
 #define TABLEVIEWWIDTH 317
 
@@ -20,8 +19,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -33,7 +31,6 @@ private slots:
     void applyScale();
     void applyRotate();
 
-
 private:
     QStandardItemModel *tableScale;
     QStandardItemModel *tableRotate;
@@ -42,11 +39,9 @@ private:
     view_t *view;
     QGraphicsScene *scene;
 
-
 protected:
     void paintEvent(QPaintEvent *event) override;
     void showEvent(QShowEvent *event) override;
-
 
 private:
     Ui::MainWindow *ui;

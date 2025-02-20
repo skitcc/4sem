@@ -1,43 +1,21 @@
-#ifndef POINTS_OPERATIONS_H
-#define POINTS_OPERATIONS_H
+#ifndef POINT_H
+#define POINT_H
 
+#include "./errorModule/errors.h"
+#include "single_point_operations.h"
+#include <stdio.h>
 
-#include <cmath>
-// #include "base_samples.h"
+typedef struct points {
+    point_t *array_of_points;
+    size_t size;
+} points_t;
 
-typedef struct
-{
-    double x, y, z;
-} point_t;
+void set_default_points(points_t &points);
+errors read_all_points(FILE *file, points_t &points);
+void free_points(points_t &points);
 
-
-typedef struct
-{
-    double dx, dy, dz;
-} transponse_t;
-
-typedef struct
-{
-    double kx, ky, kz;
-} scale_t;
-
-typedef struct
-{
-    double angle_x, angle_y, angle_z;
-} rotate_t;
-
-typedef struct 
-{
-    double r_cos, r_sin;
-} angle_components_t;
-
-
-
-
-void rotate_point(point_t &point, const point_t &center, const rotate_t &rotate_params);
-void transponse_point(point_t &point, const transponse_t &transponse_params);
-void scale_point(point_t &point, const point_t &center, const scale_t &scale_params);
-void set_default_point(point_t &point);
-
+errors rotate_points(points_t &points, const point_t &center, const rotate_t &rotate_params);
+errors transponse_points(points_t &points, const transponse_t &transponse_params);
+errors scale_points(points_t &points, const point_t &center, const scale_t &scale_params);
 
 #endif

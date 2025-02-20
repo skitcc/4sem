@@ -1,66 +1,106 @@
 #include "points_operations.h"
 
+errors allocate_points(points_t &points) {
+    if (points.size <= 0)
+        return ERR_AMOUNT;
 
-static double to_radians(const double &angle) {
-    return angle * (M_PI / 180);
+    errors rc = SUCCESS;
+    point_t *temp_array_of_points = (point_t *)malloc(points.size * sizeof(point_t));
+    if (!temp_array_of_points)
+        rc = ERR_ALLOCATION;
+
+    if (rc == SUCCESS)
+        points.array_of_points = temp_array_of_points;
+
+    return rc;
 }
 
-
-static angle_components_t calculate_angles(const double angle)
-{
-    return (angle_components_t){cos(to_radians(angle)), sin(to_radians(angle))};
+void set_default_points(points_t &points) {
+    points.array_of_points = NULL;
+    points.size = 0;
 }
 
-static void rotate_x_axis(point_t &point, const point_t &center, const double angle)
-{
-    angle_components_t angles = calculate_angles(angle);
-
-    point.y = (point.y - center.y) * angles.r_cos + (point.z - center.z) * angles.r_sin + center.y;
-    point.z = -(point.y - center.y) * angles.r_sin + (point.z - center.z) * angles.r_cos + center.z;
+void free_points(points_t &points) {
+    free(points.array_of_points);
+    set_default_points(points);
 }
 
-static void rotate_y_axis(point_t &point, const point_t &center, const double angle)
-{
-    angle_components_t angles = calculate_angles(angle);
+errors read_amount_of_points(FILE *file, size_t &size) {
+    if (!file)
+        return ERR_RECEIVE_FILE;
 
-    point.x = (point.x - center.x) * angles.r_cos + (point.z - center.z) * angles.r_sin + center.x;
-    point.z = -(point.x - center.x) * angles.r_sin + (point.z - center.z) * angles.r_cos + center.z;
+    errors rc = SUCCESS;
+    if (fscanf(file, "%zu", &size) != 1)
+        rc = ERR_AMOUNT;
+
+    return rc;
 }
 
-static void rotate_z_axis(point_t &point, const point_t &center, const double angle)
-{
-    angle_components_t angles = calculate_angles(angle);
+errors read_point(FILE *file, point_t &point) {
+    if (!file)
+        return ERR_RECEIVE_FILE;
 
-    point.x = (point.x - center.x) * angles.r_cos + (point.y - center.y) * angles.r_sin + center.x;
-    point.y = -(point.x - center.x) * angles.r_sin + (point.y - center.y) * angles.r_cos + center.y;
+    point_t temp_point;
+    errors rc = SUCCESS;
+    if (fscanf(file, "%lf %lf %lf", &temp_point.x, &temp_point.y, &temp_point.z) != 3) {
+        rc = ERR_POINTS_DATA;
+    } else {
+        point = temp_point;
+    }
+    return rc;
 }
 
+errors read_all_points(FILE *file, points_t &points) {
+    if (!file)
+        return ERR_RECEIVE_FILE;
 
-void rotate_point(point_t &point, const point_t &center, const rotate_t &rotate_params)
-{
-    rotate_x_axis(point, center, rotate_params.angle_x);
-    rotate_y_axis(point, center, rotate_params.angle_y);
-    rotate_z_axis(point, center, rotate_params.angle_z);
+    errors rc = SUCCESS;
+    points_t temp_points;
+    if (read_amount_of_points(file, temp_points.size) != SUCCESS)
+        rc = ERR_AMOUNT;
+    else {
+        if (allocate_points(temp_points))
+            rc = ERR_ALLOCATION;
+        else {
+            for (size_t i = 0; i < temp_points.size && rc == SUCCESS; i++) {
+                rc = read_point(file, temp_points.array_of_points[i]);
+            }
+            if (rc != SUCCESS)
+                free_points(temp_points);
+        }
+    }
+
+    if (rc == SUCCESS)
+        points = temp_points;
+    return rc;
 }
 
+errors rotate_points(points_t &points, const point_t &center, const rotate_t &rotate_params) {
+    if (!points.array_of_points)
+        return ERR_LOAD_DATA;
 
+    for (size_t i = 0; i < points.size; i++)
+        rotate_point(points.array_of_points[i], center, rotate_params);
 
-void transponse_point(point_t &point, const transponse_t &transponse_params)
-{
-    point.x += transponse_params.dx;
-    point.y += transponse_params.dy;
-    point.z += transponse_params.dz;
+    return SUCCESS;
 }
 
+errors transponse_points(points_t &points, const transponse_t &transponse_params) {
+    if (!points.array_of_points)
+        return ERR_LOAD_DATA;
 
-void scale_point(point_t &point, const point_t &center, const scale_t &scale_params)
-{
-    point.x = (point.x - center.x) * scale_params.kx + center.x;
-    point.y = (point.y - center.y) * scale_params.ky + center.y;
-    point.z = (point.z - center.z) * scale_params.kz + center.z; 
+    for (size_t i = 0; i < points.size; i++)
+        transponse_point(points.array_of_points[i], transponse_params);
+
+    return SUCCESS;
 }
 
-void set_default_point(point_t &point)
-{
-    point = {0, 0, 0};
+errors scale_points(points_t &points, const point_t &center, const scale_t &scale_params) {
+    if (!points.array_of_points)
+        return ERR_LOAD_DATA;
+
+    for (size_t i = 0; i < points.size; i++)
+        scale_point(points.array_of_points[i], center, scale_params);
+
+    return SUCCESS;
 }

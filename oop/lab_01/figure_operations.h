@@ -2,14 +2,10 @@
 #define FIGURE_H
 
 #include "./errorModule/errors.h"
-#include "base_samples.h"
-#include "edges.h"
-#include "points.h"
+#include "edges_operations.h"
+#include "points_operations.h"
 
-
-
-typedef struct 
-{
+typedef struct {
     points_t points;
     edges_t edges;
     point_t center;

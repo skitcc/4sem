@@ -1,22 +1,11 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
-#include "base_samples.h"
-#include <QGraphicsScene>
 #include "draw.h"
-#include "errorModule/errors.h"
 
+enum action_t { ROTATE, SCALE, TRANSPONSE, DRAW };
 
-enum action_t
-{
-    ROTATE,
-    SCALE,
-    TRANSPONSE,
-    DRAW
-};
-
-struct transformation_t 
-{
+struct transformation_t {
     const transponse_t transponse_params;
     const scale_t scale_params;
     const rotate_t rotate_params;
@@ -25,18 +14,12 @@ struct transformation_t
         : transponse_params(t), scale_params(s), rotate_params(r) {}
 };
 
-
-typedef struct 
-{
+typedef struct {
     view_t *view;
     action_t action;
     transformation_t transform_params;
 } connection_t;
 
-
 void handle_action(connection_t &connection, figure_t &figure);
-
-
-
 
 #endif

@@ -12,21 +12,20 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     draw.cpp \
-    edges.cpp \
-    points.cpp \
-    figure.cpp \
+    edges_operations.cpp \
     points_operations.cpp \
+    figure_operations.cpp \
+    single_point_operations.cpp \
     ./errorModule/errors.cpp \
     actions.cpp
 
 HEADERS += \
     mainwindow.h \
     draw.h \
-    edges.h \
-    points.h \
-    figure.h \
+    edges_operations.h \
     points_operations.h \
-    base_samples.h \
+    figure_operations.h \
+    single_point_operations.cpp \
     ./errorModule/errors.h \
     actions.h
     
