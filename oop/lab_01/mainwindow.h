@@ -10,6 +10,7 @@
 
 #include "draw.h"
 #include "figure.h"
+#include "actions.h"
 
 #define TABLEVIEWWIDTH 317
 
@@ -38,12 +39,13 @@ private:
     QStandardItemModel *tableRotate;
     QStandardItemModel *tableTransponse;
     figure_t figure;
-    view_t view;
+    view_t *view;
     QGraphicsScene *scene;
 
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 
 private:

@@ -19,7 +19,7 @@ typedef struct
 
 
 
-errors draw_figure(const figure_t &figure, view_t &view);
+errors draw_figure(const figure_t &figure, view_t *view);
 void draw_line(const point_t &p1, const point_t &p2, QGraphicsScene *scene);
 
 

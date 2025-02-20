@@ -16,19 +16,19 @@ void draw_line(const point_t &p1, const point_t &p2, QGraphicsScene *scene)
 }
 
 
-errors clear_scene(const view_t &view)
+errors clear_scene(const view_t *view)
 {
-    if (!view.scene)
+    if (!view->scene)
         return ERR_WRONG_SCENE;
 
-    view.scene->clear();
+    view->scene->clear();
     return SUCCESS;
 }
 
 
-void draw_lines(const points_t &points, const edges_t &edges, const view_t &view)
+void draw_lines(const points_t &points, const edges_t &edges, const view_t *view)
 {
-    if (view.scene == nullptr) {
+    if (view->scene == nullptr) {
         qDebug() << "Error: Scene is not initialized!";
         return;
     }
@@ -41,15 +41,15 @@ void draw_lines(const points_t &points, const edges_t &edges, const view_t &view
         point_t p2 = points.array_of_points[edges.array_of_edges[i].end_edge];
 
 
-        convert_coord(p1, view.width, view.height);
-        convert_coord(p2, view.width, view.height);
+        convert_coord(p1, view->width, view->height);
+        convert_coord(p2, view->width, view->height);
 
-        draw_line(p1, p2, view.scene);
+        draw_line(p1, p2, view->scene);
     }
 }
 
 
-errors draw_figure(const figure_t &figure, view_t &view)
+errors draw_figure(const figure_t &figure, view_t *view)
 {
     errors rc = clear_scene(view);
     

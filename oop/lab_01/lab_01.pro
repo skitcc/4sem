@@ -16,7 +16,8 @@ SOURCES += \
     points.cpp \
     figure.cpp \
     points_operations.cpp \
-    ./errorModule/errors.cpp 
+    ./errorModule/errors.cpp \
+    actions.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -26,7 +27,8 @@ HEADERS += \
     figure.h \
     points_operations.h \
     base_samples.h \
-    ./errorModule/errors.h 
+    ./errorModule/errors.h \
+    actions.h
     
 
 FORMS += \

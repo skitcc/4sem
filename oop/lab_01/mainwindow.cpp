@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (!scene)
         qDebug() << "scene not valid";
 
-    set_figure(figure, "../data/cube3D.txt");
+    set_figure(figure, "../data/pyramid.txt");
 
     connect(ui->transpositionButton, &QPushButton::clicked, this, &MainWindow::applyTransponse);
     connect(ui->scalingButton, &QPushButton::clicked, this, &MainWindow::applyScale);
@@ -77,7 +77,6 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     // qDebug() << "Widget width:" << width() << "Widget height:" << height();
 
 
-    view = {.height = height(), .width = width(), .scene = scene};
 
     // for (int i = 0; i < figure.points.size; i++)
     // {
@@ -86,6 +85,11 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
     draw_figure(figure, view);
 
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    Q_UNUSED(event);
+    *view = {.height = height(), .width = width(), .scene = scene};
 }
 
 
@@ -101,12 +105,14 @@ void MainWindow::applyTransponse() {
     }
 
 
-    // if (ok1 && ok2)
-    //     // transformationWidget->transponse(dx, dy);
-    // else {
-    //     QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для переноса");
-    //     return;
-    // }
+    if (ok1 && ok2 && ok3)
+    {
+        transponse_t transponse = {dx, dy, dz};
+        transformation_t transformation(transponse, {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0});
+        connection_t connection = {view, TRANSPONSE, transformation};
+        handle_action(connection, figure);
+    }
+
 
     update();
 
@@ -123,13 +129,16 @@ void MainWindow::applyScale() {
         kz = tableScale->item(0, 2)->text().toDouble(&ok3);
     }
 
-    // if (ok1 && ok2 && ok3 && ok4) {
-    //     transformationWidget->scale(kx, ky, cx, cy);
-    // }
-    // else {
-    //     QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для масштабирования");
-    //     return;
-    // }
+    if (ok1 && ok2 && ok3) {
+        scale_t scale = {kx, ky, kz};
+        transformation_t transformation({0.0, 0.0, 0.0}, scale, {0.0, 0.0, 0.0});
+        connection_t connection = {view, SCALE, transformation};
+        handle_action(connection, figure);
+    }
+    else {
+        QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для масштабирования");
+        return;
+    }
 
 
     update();
@@ -146,12 +155,15 @@ void MainWindow::applyRotate() {
         angleZ = tableRotate->item(0, 2)->text().toDouble(&ok3);
     }
 
-    // if (ok1 && ok2 && ok3) {
-    //     transformationWidget->rotate(rx, ry, angle);
-    // } else {
-    //     QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для поворота");
-    //     return;
-    // }
+    if (ok1 && ok2 && ok3) {
+        rotate_t rotate  = {angleX, angleY, angleZ};
+        transformation_t transformation({0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}, rotate);
+        connection_t connection = {view, ROTATE, transformation};
+        handle_action(connection, figure);
+    } else {
+        QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для поворота");
+        return;
+    }
 
     update();
 }
