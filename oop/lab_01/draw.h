@@ -1,9 +1,7 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#include "edges_operations.h"
 #include "figure_operations.h"
-#include "points_operations.h"
 #include <QGraphicsScene>
 
 typedef struct {

@@ -1,10 +1,6 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-
-#include <QMessageBox>
-#include <QDebug>
-
 enum errors
 {
     SUCCESS,

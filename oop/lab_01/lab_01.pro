@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -16,7 +16,7 @@ SOURCES += \
     points_operations.cpp \
     figure_operations.cpp \
     single_point_operations.cpp \
-    ./errorModule/errors.cpp \
+    errors.cpp \
     actions.cpp
 
 HEADERS += \
@@ -26,7 +26,7 @@ HEADERS += \
     points_operations.h \
     figure_operations.h \
     single_point_operations.cpp \
-    ./errorModule/errors.h \
+    errors.h \
     actions.h
     
 

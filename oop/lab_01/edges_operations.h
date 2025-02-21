@@ -1,7 +1,7 @@
 #ifndef EDGES_H
 #define EDGES_H
 
-#include "../errorModule/errors.h"
+#include "errors.h"
 #include <stdio.h>
 
 typedef struct edge_t {

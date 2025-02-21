@@ -1,4 +1,6 @@
 #include "points_operations.h"
+#include <cstdlib>
+
 
 errors allocate_points(points_t &points) {
     if (points.size <= 0)
@@ -42,7 +44,7 @@ errors read_point(FILE *file, point_t &point) {
 
     point_t temp_point;
     errors rc = SUCCESS;
-    if (fscanf(file, "%lf %lf %lf", &temp_point.x, &temp_point.y, &temp_point.z) != 3) {
+    if (fscanf(file, "%lf%lf%lf", &temp_point.x, &temp_point.y, &temp_point.z) != 3) {
         rc = ERR_POINTS_DATA;
     } else {
         point = temp_point;

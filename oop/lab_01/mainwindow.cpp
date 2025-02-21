@@ -72,10 +72,9 @@ void MainWindow::applyTransponse() {
         dz = tableTransponse->item(0, 2)->text().toDouble(&ok3);
     }
 
-    if (ok1 && ok2 && ok3) {
+    if (ok1 && ok2 && ok3) { 
         transponse_t transponse = {dx, dy, dz};
-        transformation_t transformation(transponse, {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0});
-        connection_t connection = {view, TRANSPONSE, transformation};
+        connection_t connection = {view, TRANSPONSE, .transponse_params = transponse};
         handle_action(connection, figure);
     }
 
@@ -95,8 +94,7 @@ void MainWindow::applyScale() {
 
     if (ok1 && ok2 && ok3) {
         scale_t scale = {kx, ky, kz};
-        transformation_t transformation({0.0, 0.0, 0.0}, scale, {0.0, 0.0, 0.0});
-        connection_t connection = {view, SCALE, transformation};
+        connection_t connection = {view, SCALE, .scale_params = scale};
         handle_action(connection, figure);
     } else {
         QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для масштабирования");
@@ -119,8 +117,7 @@ void MainWindow::applyRotate() {
 
     if (ok1 && ok2 && ok3) {
         rotate_t rotate = {angleX, angleY, angleZ};
-        transformation_t transformation({0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}, rotate);
-        connection_t connection = {view, ROTATE, transformation};
+        connection_t connection = {view, ROTATE, .rotate_params = rotate};
         handle_action(connection, figure);
     } else {
         QMessageBox::information(this, "Ошибка", "Ошибка ввода полей для поворота");
@@ -134,5 +131,6 @@ MainWindow::~MainWindow() {
     delete tableRotate;
     delete tableScale;
     delete tableTransponse;
+    delete scene;
     delete ui;
 }

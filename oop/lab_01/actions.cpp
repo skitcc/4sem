@@ -5,15 +5,14 @@ void handle_action(connection_t &connection, figure_t &figure) {
     case DRAW:
         draw_figure(figure, connection.view);
         break;
-
     case ROTATE:
-        rotate_figure(figure, connection.transform_params.rotate_params);
+        rotate_figure(figure, connection.rotate_params);
         break;
     case SCALE:
-        scale_figure(figure, connection.transform_params.scale_params);
+        scale_figure(figure, connection.scale_params);
         break;
     case TRANSPONSE:
-        transponse_figure(figure, connection.transform_params.transponse_params);
+        transponse_figure(figure, connection.transponse_params);
         break;
     default:
         break;

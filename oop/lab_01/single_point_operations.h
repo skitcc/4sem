@@ -1,8 +1,6 @@
 #ifndef POINTS_OPERATIONS_H
 #define POINTS_OPERATIONS_H
 
-#include <cmath>
-
 typedef struct {
     double x, y, z;
 } point_t;

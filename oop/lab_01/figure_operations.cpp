@@ -17,10 +17,10 @@ static errors read_figure(FILE *file, figure_t &figure) {
     errors rc = read_all_points(file, temp_figure.points);
     if (rc == SUCCESS) {
         rc = read_all_edges(file, temp_figure.edges);
-        if (rc)
+        if (rc != SUCCESS)
             free_points(figure.points);
-
-        figure = temp_figure;
+        else
+            figure = temp_figure;
     }
 
     return rc;

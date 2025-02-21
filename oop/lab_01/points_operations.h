@@ -1,9 +1,9 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include "./errorModule/errors.h"
+#include "errors.h"
+#include <cstdio>
 #include "single_point_operations.h"
-#include <stdio.h>
 
 typedef struct points {
     point_t *array_of_points;

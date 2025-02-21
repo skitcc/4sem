@@ -7,13 +7,13 @@ static void convert_coord(point_t &point, double width, double height) {
 
 static void draw_line(const point_t &p1, const point_t &p2, QGraphicsScene *scene) {
     scene->addLine(p1.x, p1.y, p2.x, p2.y);
-}
+}   
 
-static errors clear_scene(const view_t *view) {
-    if (!view->scene)
+static errors clear_scene(QGraphicsScene *scene) {
+    if (!scene)
         return ERR_WRONG_SCENE;
 
-    view->scene->clear();
+    scene->clear();
     return SUCCESS;
 }
 
@@ -44,7 +44,7 @@ static errors draw_lines(const points_t &points, const edges_t &edges, const vie
 }
 
 errors draw_figure(const figure_t &figure, view_t *view) {
-    errors rc = clear_scene(view);
+    errors rc = clear_scene(view->scene);
 
     if (!rc)
         draw_lines(figure.points, figure.edges, view);

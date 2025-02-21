@@ -1,4 +1,6 @@
 #include "edges_operations.h"
+#include <cstdlib>
+
 
 static errors allocate_edges(edges_t &edges) {
     if (edges.size <= 0)
@@ -43,7 +45,7 @@ static errors read_edge(FILE *file, edge_t &edge) {
 
     edge_t local_edge;
     errors rc = SUCCESS;
-    if (fscanf(file, "%d %d", &local_edge.start_edge, &local_edge.end_edge) != 2)
+    if (fscanf(file, "%d%d", &local_edge.start_edge, &local_edge.end_edge) != 2)
         rc = ERR_EDGES_DATA;
     else
         edge = local_edge;
@@ -62,7 +64,7 @@ errors read_all_edges(FILE *file, edges_t &edges) {
         if (allocate_edges(temp_edges))
             rc = ERR_ALLOCATION;
         else {
-            for (size_t i = 0; i < temp_edges.size && rc == SUCCESS; i++) {
+            for (int i = 0; i < temp_edges.size && rc == SUCCESS; i++) {
                 rc = read_edge(file, temp_edges.array_of_edges[i]);
             }
             if (rc != SUCCESS)

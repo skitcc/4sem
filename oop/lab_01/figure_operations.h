@@ -1,9 +1,11 @@
 #ifndef FIGURE_H
 #define FIGURE_H
 
-#include "./errorModule/errors.h"
+#include "errors.h"
 #include "edges_operations.h"
 #include "points_operations.h"
+#include "single_point_operations.h"
+#include <stdio.h>
 
 typedef struct {
     points_t points;
